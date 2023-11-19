@@ -41,7 +41,7 @@ public class App {
                 PosicaoAtual++; 
 
 
-            } else if (currentChar == '.') { 
+            } else if (currentChar == '.' ) { 
 
 
                 analyzeDecimal(); 
@@ -106,58 +106,42 @@ public class App {
         return tokens; 
     } 
 
-    private void analyzeInteger() { 
-
-
-        StringBuilder tokenValue = new StringBuilder(); 
-
-
-        while (PosicaoAtual < codigoFonte.length() && Character.isDigit(codigoFonte.charAt(PosicaoAtual))) { 
-
-
-            tokenValue.append(codigoFonte.charAt(PosicaoAtual)); 
-
-
-            PosicaoAtual++; 
-
-        } 
-
-        if (PosicaoAtual < codigoFonte.length() 
-
-
-                && (Character.isDigit(codigoFonte.charAt(PosicaoAtual)) || codigoFonte.charAt(PosicaoAtual) == '.')) { 
-
-
-            tokens.add(new Token(TipoToken.NUM_DECIMAL, tokenValue.toString())); 
-
-
-        } else { 
-
-
-            tokens.add(new Token(TipoToken.NUM_INTEIRO, tokenValue.toString())); 
-
-        } 
-
-
-    } 
-
-    private void analyzeDecimal() { 
-
-
+    private void analyzeInteger() {
         StringBuilder tokenValue = new StringBuilder();
+    
+        while (PosicaoAtual < codigoFonte.length() && Character.isDigit(codigoFonte.charAt(PosicaoAtual))) {
+            tokenValue.append(codigoFonte.charAt(PosicaoAtual));
+            PosicaoAtual++;
+        }
+    
+        // Se o próximo caractere for um ponto decimal, chama analyzeDecimal()
+        if (PosicaoAtual < codigoFonte.length() && codigoFonte.charAt(PosicaoAtual) == '.') {
+            analyzeDecimal();
+        } else {
+            tokens.add(new Token(TipoToken.NUM_INTEIRO, tokenValue.toString()));
+        }
+    }
+    
+
+    private void analyzeDecimal() {
+        StringBuilder tokenValue = new StringBuilder();
+
+        tokenValue.append(codigoFonte.charAt(PosicaoAtual - 1));
+        tokenValue.append('.');
+
+        PosicaoAtual++;
 
         while (PosicaoAtual < codigoFonte.length() &&
                 (Character.isDigit(codigoFonte.charAt(PosicaoAtual)) || codigoFonte.charAt(PosicaoAtual) == '.')) {
             tokenValue.append(codigoFonte.charAt(PosicaoAtual));
             PosicaoAtual++;
         }
-    
-        // Adiciona ".0" se não houver parte decimal
-        if (!tokenValue.toString().contains(".")) {
-            tokenValue.append(".0");
+
+        if (Character.isDigit(tokenValue.charAt(0))) {
+            tokens.add(new Token(TipoToken.NUM_DECIMAL, tokenValue.toString()));
+        } else {
+            // do something else
         }
-    
-        tokens.add(new Token(TipoToken.NUM_DECIMAL, tokenValue.toString()));
     }
 
     private void analyzeIdentifierOrKeyword() { 
@@ -166,43 +150,20 @@ public class App {
         StringBuilder tokenValue = new StringBuilder(); 
 
 
-        while (PosicaoAtual < codigoFonte.length() && (Character.isLetterOrDigit(codigoFonte.charAt(PosicaoAtual)) 
-
-
-                || codigoFonte.charAt(PosicaoAtual) == '_')) { 
-
-
+        while (PosicaoAtual < codigoFonte.length() && (Character.isLetterOrDigit(codigoFonte.charAt(PosicaoAtual)) || codigoFonte.charAt(PosicaoAtual) == '_')) { 
             tokenValue.append(codigoFonte.charAt(PosicaoAtual)); 
-
-
             PosicaoAtual++; 
-
-
         } 
-
-
+        
         String tokenString = tokenValue.toString(); 
 
-
         if (isKeyword(tokenString)) { 
-
-
             tokens.add(new Token(TipoToken.PALAVRARESERVADA, tokenString)); 
-
-
         } else { 
-
-
-            tokens.add(new Token(TipoToken.IDENTIFICADOR, tokenString)); 
-
-
+        tokens.add(new Token(TipoToken.IDENTIFICADOR, tokenString)); 
         } 
-
-
     } 
-
     private void analyzeText() { 
-
 
         PosicaoAtual++; 
 
@@ -248,31 +209,28 @@ public class App {
 
     } 
 
-    private void analyzeOperator() { 
-
-
-        String operator = String.valueOf(codigoFonte.charAt(PosicaoAtual)); 
-
-
-        PosicaoAtual++; 
-
-
-        while (PosicaoAtual < codigoFonte.length() && isOperadorSimbolo(codigoFonte.charAt(PosicaoAtual))) { 
-
-
-            operator += codigoFonte.charAt(PosicaoAtual); 
-
-
-            PosicaoAtual++; 
-
-
-        } 
-
-
-        tokens.add(new Token(TipoToken.OPERADOR, operator)); 
-
-
-    } 
+    private void analyzeOperator() {
+        char currentChar = codigoFonte.charAt(PosicaoAtual);
+    
+        // Se o operador é "++" ou "--"
+        if ((currentChar == '+' || currentChar == '-') && PosicaoAtual + 1 < codigoFonte.length() && codigoFonte.charAt(PosicaoAtual + 1) == currentChar) {
+            tokens.add(new Token(TipoToken.IDENTIFICADOR, String.valueOf(currentChar)));
+            tokens.add(new Token(TipoToken.OPERADOR, String.valueOf(currentChar)));
+            PosicaoAtual += 2; // Avança dois caracteres para além do operador "++" ou "--"
+        } else {
+            // Trata outros operadores
+            String operator = String.valueOf(currentChar);
+            PosicaoAtual++;
+    
+            while (PosicaoAtual < codigoFonte.length() && isOperadorSimbolo(codigoFonte.charAt(PosicaoAtual))) {
+                operator += codigoFonte.charAt(PosicaoAtual);
+                PosicaoAtual++;
+            }
+    
+            tokens.add(new Token(TipoToken.OPERADOR, operator));
+        }
+    }
+    
 
 
     private void analyzeSpecialSymbol() { 
