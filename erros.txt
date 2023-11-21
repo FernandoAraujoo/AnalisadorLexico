@@ -1,3 +1,5 @@
 i++
 decimal
 .length
+i=i+1;
+i++

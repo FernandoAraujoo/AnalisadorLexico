@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
  
-public class App { 
+public class App extends Throwable{ 
 
     private String codigoFonte; 
 
@@ -140,7 +140,7 @@ public class App {
         if (Character.isDigit(tokenValue.charAt(0))) {
             tokens.add(new Token(TipoToken.NUM_DECIMAL, tokenValue.toString()));
         } else {
-            // do something else
+            throw new RuntimeException(". depois de virgula");
         }
     }
 

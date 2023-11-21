@@ -19,14 +19,14 @@ void saudacao() {
  println(mensagem);
  println("O número é: " + numero);
 }
-// Este é um comentário de linha.
+// Este é um comentário de linha
 int dobrar(int x) {
  /* Este é um comentário
- de múltiplas linhas. /
+ de múltiplas linhas /
  return x 2;
 }
 void imprimirValores(int valores[]) {
- for (int i = 0; i < valores.length; i++) {
+ for (int i = 0; i < valoreslength; i++) {
  println("Valor[" + i + "] = " + valores[i]);
  }
 }
